@@ -365,12 +365,9 @@ void CrearDisco(char* dir, int tam) {
             case 25:strcpy(tempDisco.llave,"vdz");break;
         }
         printf("<!> INFO: Identificador de diso = %s \n", tempDisco.llave);
-        //strcpy(tempDisco.llave, idDisc);
-
         if(mkdir(dir, 0777) == 0){
             printf("<!> INFO: Se ha creado la carpeta.");
         }
-        //strcat(dir, "/");
         strcat(dir, sublista[1]);
         tempDisco.direccion = dir;
         tempDisco.estado = 1;
@@ -379,23 +376,17 @@ void CrearDisco(char* dir, int tam) {
         fwrite(&tempDisco, sizeof (disco), 1, indx);
         printf("%s | %s | %d\n\n", tempDisco.llave, tempDisco.direccion, tempDisco.estado);
         fclose(indx);
-        //AQUI ESCRIBO EL DISCO
+        
+        //ESCRITURA DEL DISCO
         int contador;
         contador = 1;
         MBR tempMBR;
         basura tempBasura;
         int i;
-
-
         FILE *disc = fopen(dir, "ab");
-
-
         tempMBR.mbr_tamanio = tam;
-        //printf("TAM=%d\n",tempMBR.mbr_tamanio);
         tempMBR.mbr_disk_signature = contador;
-        //printf("CORRELATIVO=%d",tempMBR.mbr_disk_signature);
         strcpy(tempMBR.mbr_fecha_creacion, fecha);
-        //printf("FECHA=%s",tempMBR.mbr_fecha_creacion);
         int j;
         for (j = 0; j < 4; j++) {
             strcpy(tempMBR.mbr_particion[j].part_status, "0");
