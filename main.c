@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
-#include <estructuras.h>
+#include <edd.h>
 #include <reportes.h>
 
 
