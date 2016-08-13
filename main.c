@@ -10,6 +10,7 @@
 #include <fcntl.h>
 
 #include <edd.h>
+#include <particiones.h>
 #include <reportes.h>
 
 
@@ -21,7 +22,7 @@
 //DECLARANDO LOS METODOS
 void inicio();
 void leecad(char *cad, int n);
-void SplitIgual(char* igual);
+void SplitDosPuntos(char* igual);
 void SplitEspacio(char* blanco);
 void SplitSlash(char* slash);
 void getAnalizador(char* token);
@@ -107,7 +108,7 @@ void getAnalizador(char* token) {
         char unit[1];
         int tam;
         if (lista[1] != NULL) {
-            SplitIgual(lista[1]);
+            SplitDosPuntos(lista[1]);
             if (strcasecmp(sublista[0], "-size") == 0) {
                 if (atoi(sublista[1]) >= 0) {
                     size = atoi(sublista[1]);
@@ -122,7 +123,7 @@ void getAnalizador(char* token) {
             }
         }
         if (lista[2] != NULL) {
-            SplitIgual(lista[2]);
+            SplitDosPuntos(lista[2]);
             if (strcasecmp(sublista[0], "+unit") == 0) {
                 otro = size;
                 strcpy(unit, sublista[1]);
@@ -149,7 +150,7 @@ void getAnalizador(char* token) {
             }
         }
         if (lista[3] != NULL) {
-            SplitIgual(lista[3]);
+            SplitDosPuntos(lista[3]);
             if (strcasecmp(sublista[0], "-path") == 0) {
                 SplitComillas(sublista[1]);
                 strcpy(sublista[1], subListaC[0]);
@@ -161,7 +162,7 @@ void getAnalizador(char* token) {
             }
         }
         if (lista[4] != NULL) {
-            SplitIgual(lista[4]);
+            SplitDosPuntos(lista[4]);
             if (strcasecmp(sublista[0], "-name") == 0) {
                 SplitComillas(sublista[1]);
                 strcpy(sublista[1], subListaC[0]);
@@ -189,7 +190,7 @@ void getAnalizador(char* token) {
         char *ruta;
         ruta = malloc(sizeof (200));
         if (lista[1] != NULL) {
-            SplitIgual(lista[1]);
+            SplitDosPuntos(lista[1]);
             if (strcasecmp(sublista[0], "-path") == 0) {
                 SplitComillas(sublista[1]);
                 strcpy(sublista[1], subListaC[0]);
@@ -215,6 +216,168 @@ void getAnalizador(char* token) {
         }
     }
 
+//IF DEL COMANDO FDISK---------------------------------------------------------------------------------------
+
+        else if (strcasecmp(token, "fdisk") == 0) {
+            printf("Entro fdisk");
+            bandera = 1;
+            int aux;
+            aux = 0;
+            f1 = 0;
+            f2 = 0;
+            int size = 0;
+            char *unit;
+            char *fit;
+            char *del;
+            int tam = 0;
+            char *ruta;
+            char *name;
+            int add;
+            char *type;
+            if (lista[1] != NULL) {
+                SplitDosPuntos(lista[1]);
+                if (strcasecmp(sublista[0], "-size") == 0) {
+                    printf("Viene -size");
+                    if (atoi(sublista[1]) >= 0) {
+                        size = atoi(sublista[1]);
+                        tam = size*KB;
+                        printf("ESTO HAY EN TAMAÑO %d\n", size);
+                    } else {
+                        printf("El tamaño que ingreso es invalido");
+                        bandera = 0;
+                    }
+                } else {
+                    printf("SE ESPERABA -SIZE");
+                    bandera = 0;
+                }
+            }
+            if (lista[2] != NULL) {
+                SplitDosPuntos(lista[2]);
+                if (strcasecmp(sublista[0], "+unit") == 0 && f1 == 0 && f2 == 0) {
+                    otro = size;
+                    unit = malloc(1);
+                    strcpy(unit, sublista[1]);
+                    printf("ESTO HAY EN UNIT: %s\n", unit);
+                    printf("ESTO HAY EN SUBLISTA: %s\n", sublista[0]);
+                    if (strcasecmp(unit, "K") == 0) {
+                        printf("VIENE K");
+                        tam = otro*KB;
+                        printf("Esto tiene otro %d\n", otro);
+                        printf("Esto tiene K %d\n", tam);
+
+                    } else if (strcasecmp(unit, "M") == 0) {
+                        printf("VIENE M");
+                        tam = otro * KB*KB;
+                        printf("Esto tiene size %d\n", otro);
+                        printf("Esto tiene M %d\n", tam);
+                    } else if (strcasecmp(unit, "B") == 0) {
+                        printf("VIENE B");
+                        tam = otro;
+                        printf("Esto tiene size %d\n", otro);
+                        printf("Esto tiene B %d\n", tam);
+                    } else {
+                        printf("DEBE DE ASIGNARLE UN PARAMETRO PERMITIDO A +UNIT");
+                        bandera = 0;
+                    }
+                }
+            }
+            if (lista[3] != NULL) {
+                SplitDosPuntos(lista[3]);
+                if (strcasecmp(sublista[0], "-path") == 0 && f1 == 0 && f2 == 0) {
+                    ruta = malloc(200);
+                    strcpy(ruta, sublista[1]);
+                    printf("ESTO HAY EN PATH: %s\n", ruta);
+                } else {
+                    printf("SE ESPERABA PATH");
+
+                }
+            }
+
+            if (lista[4] != NULL) {
+                SplitDosPuntos(lista[4]);
+                if (strcasecmp(sublista[0], "+type") == 0 && f1 == 0 && f2 == 0) {
+                    printf("Entro +type");
+                    printf("VIENE +Type\n");
+                    if (strcasecmp(sublista[1], "P") == 0) {
+                        type = malloc(1);
+                        strcpy(type, sublista[1]);
+
+                    } else if (strcasecmp(sublista[1], "E") == 0) {
+                        type = malloc(1);
+                        strcpy(type, sublista[1]);
+
+                    } else if (strcasecmp(sublista[1], "L") == 0) {
+                        type = malloc(1);
+                        strcpy(type, sublista[1]);
+                    } else {
+                        printf("Debe asignarle un valor permitido a +type\n");
+                        bandera = 0;
+                    }
+
+                } else {
+                    printf("INGRESE UN COMANDO VALIDO");
+                    bandera = 0;
+                }
+            }
+            if (lista[5] != NULL) {
+                SplitDosPuntos(lista[5]);
+                if (strcasecmp(sublista[0], "+fit") == 0 && f1 == 0 && f2 == 0) {
+                    printf("Entro +fit");
+                    if (strcasecmp(sublista[1], "BF") == 0) {
+                        fit = malloc(2);
+                        strcpy(fit, sublista[1]);
+
+                    } else if (strcasecmp(sublista[1], "FF") == 0) {
+                        fit = malloc(2);
+                        strcpy(fit, sublista[1]);
+
+
+                    } else if (strcasecmp(sublista[1], "WF") == 0) {
+                        fit = malloc(2);
+                        strcpy(fit, sublista[1]);
+
+                    } else {
+                        printf("Asignele un valor correcto a +fit\n");
+                    }
+
+                } else {
+                    bandera = 0;
+                }
+            }
+            if (lista[6] != NULL) {
+                SplitDosPuntos(lista[6]);
+                if (strcasecmp(sublista[0], "-name") == 0 && f1 == 0 && f2 == 0) {
+                    printf("Entro -name");
+                    name = malloc(50);
+                    strcpy(name, sublista[1]);
+
+                } else {
+                    bandera = 0;
+                }
+            }
+            printf("ESTO TRAEN LAS F'S: %d, %d", f1, f2);
+            //printf("size%d\n",tam);
+            //printf("unit%s\n",unit);
+            //printf("path%s\n",ruta);
+            //printf("type%s\n",type);
+            //printf("fit%s\n",fit);
+            //printf("name%s\n",name);
+            //printf("del%s\n",del);
+            //printf("add%d\n",add);
+            if (bandera == 1) {
+                if (f1 == 0 && f2 == 0) {
+                    CrearParticion(tam, ruta, fit, type, name);
+                }
+                if (f1 == 1) {
+                    EliminarParticion(ruta, del, name);
+                }
+                if (f2 == 1) {
+                    AgregarEspacio(ruta, tam, add, name);
+
+                }
+            }
+
+        }
 
 
 
@@ -242,7 +405,7 @@ void SplitEspacio(char* blanco) {
     int contador = 0;
     while (token != NULL) {
         lista[contador] = malloc(200);
-        printf("%s\n", token);
+        //printf("%s\n", token);
         strcpy(lista[contador], token);
         printf("LISTA POSICION %d: %s\n", contador, lista[contador]);
         contador = contador + 1;
@@ -260,7 +423,7 @@ void SplitEspacio(char* blanco) {
 //-----------------------------------------------------------------------------------------------------------
 //METODO PARA SPLIT =
 
-void SplitIgual(char* igual) {
+void SplitDosPuntos(char* igual) {
     const char s[2] = "::";
     char *token;
     token = malloc(200);
@@ -283,7 +446,7 @@ void SplitSlash(char* slash) {
     token = malloc(200);
     token = strtok(slash, s);
     while (token != NULL) {
-        printf("%s\n", token);
+        //printf("%s\n", token);
         token = strtok(NULL, s);
     }
 }
@@ -322,14 +485,13 @@ void SplitComillas(char* comilla){
 //METODO PARA CREAR DISCO
 
 void CrearDisco(char* dir, int tam) {
-    printf("ENTRO A CREAR DISCO\n");
     if (id < 26) {
         disco tempDisco;
         time_t tiempo = time(0);
         struct tm *tlocal = localtime(&tiempo);
         char fecha[15];
         char *idDisc;
-        char identificador[1];
+
         char *rutaManejador;
         strftime(fecha, 128, "%d/%m/%y %H:%M", tlocal);
         tempDisco.direccion = malloc(200);
@@ -365,9 +527,11 @@ void CrearDisco(char* dir, int tam) {
             case 25:strcpy(tempDisco.llave,"vdz");break;
         }
         printf("<!> INFO: Identificador de diso = %s \n", tempDisco.llave);
+
         if(mkdir(dir, 0777) == 0){
             printf("<!> INFO: Se ha creado la carpeta.");
         }
+
         strcat(dir, sublista[1]);
         tempDisco.direccion = dir;
         tempDisco.estado = 1;
@@ -376,7 +540,7 @@ void CrearDisco(char* dir, int tam) {
         fwrite(&tempDisco, sizeof (disco), 1, indx);
         printf("%s | %s | %d\n\n", tempDisco.llave, tempDisco.direccion, tempDisco.estado);
         fclose(indx);
-        
+
         //ESCRITURA DEL DISCO
         int contador;
         contador = 1;
@@ -390,20 +554,17 @@ void CrearDisco(char* dir, int tam) {
         int j;
         for (j = 0; j < 4; j++) {
             strcpy(tempMBR.mbr_particion[j].part_status, "0");
-            printf("<$> PART_STATUS=%s\n", tempMBR.mbr_particion[j].part_status);
             tempMBR.mbr_particion[j].part_type = malloc(1);
             strcpy(tempMBR.mbr_particion[j].part_type, "");
-            printf("<$> PART_TYPE=%s\n", tempMBR.mbr_particion[j].part_type);
             strcpy(tempMBR.mbr_particion[j].part_fit, "");
-            printf("<$> PART_FIT=%s\n", tempMBR.mbr_particion[j].part_fit);
             tempMBR.mbr_particion[j].part_start = 0;
-            printf("<$> PART_START=%d\n", tempMBR.mbr_particion[j].part_start);
             tempMBR.mbr_particion[j].part_size = 0;
-            printf("<$> PART_SIZE=%d\n", tempMBR.mbr_particion[j].part_size);
             strcpy(tempMBR.mbr_particion[j].part_name, "");
-            printf("<$> PART_NAME=%s\n", tempMBR.mbr_particion[j].part_name);
             tempMBR.mbr_particion[j].part_id = j + 1;
-            printf("<$> PART_ID=%d\n\n", tempMBR.mbr_particion[j].part_id);
+            /*printf("<$> PART_STATUS=%s      <$> PART_TYPE=%s\n", tempMBR.mbr_particion[j].part_status, tempMBR.mbr_particion[j].part_type);
+            printf("<$> PART_FIT=%s     <$> PART_START=%d\n", tempMBR.mbr_particion[j].part_fit, tempMBR.mbr_particion[j].part_start);
+            printf("<$> PART_SIZE=%d    <$> PART_NAME=%s\n", tempMBR.mbr_particion[j].part_size, tempMBR.mbr_particion[j].part_name);
+            printf("<$> PART_ID=%d\n\n", tempMBR.mbr_particion[j].part_id);*/
         }
         fseek(disc, 0, SEEK_SET);
         fwrite(&tempMBR, sizeof (MBR), 1, disc);
@@ -424,7 +585,6 @@ void CrearDisco(char* dir, int tam) {
 //METODO PARA ELIMINAR DISCO
 
 void EliminarDisco(char *dir) {
-    //printf("ENTRO A ELIMINAR\n");
     if (remove(dir) == 0) {
         printf("<!> INFO: El archivo fue eliminado satisfactoriamente.\n");
         FILE *eliminar = fopen("/home/saul/Desktop/manejador.dsk", "rb+");
